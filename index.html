@@ -630,6 +630,26 @@
             display: block;
         }
 
+        .pong-restart-btn {
+            display: block;
+            margin: 14px auto 0;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border: 2px solid var(--lime);
+            color: var(--lime);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55rem;
+            cursor: none !important;
+            border-radius: 8px;
+            box-shadow: var(--box-glow-lime);
+            transition: all 0.2s;
+        }
+
+        .pong-restart-btn:hover {
+            background: var(--lime);
+            color: #000;
+        }
+
         /* Music Player */
         .player-section {
             margin: 4rem auto;
@@ -809,7 +829,7 @@
             z-index: 9999;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 10px #fff, 0 0 20px var(--cyan), 0 0 40px var(--cyan);
-            transition: width 0.2s, height 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            transition: left 0.08s ease-out, top 0.08s ease-out, width 0.2s, height 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
         }
 
         .cursor-trail {
@@ -822,12 +842,13 @@
             z-index: 9998;
             transform: translate(-50%, -50%);
             box-shadow: 0 0 10px var(--magenta);
-            animation: trailFade 0.5s linear forwards;
+            animation: trailFade 0.75s ease-out forwards;
+            will-change: opacity, transform;
         }
 
         @keyframes trailFade {
-            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
+            0% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
         }
 
         /* PACMAN-22 Animation */
@@ -904,7 +925,7 @@
         @media (hover: none) and (pointer: coarse) {
             .cursor-dot, .cursor-trail { display: none !important; }
             * { cursor: auto !important; }
-            .slider, .player-button { cursor: pointer !important; }
+            .slider, .player-button, .pong-start, .pong-restart-btn { cursor: pointer !important; }
         }
     </style>
 </head>
@@ -1026,6 +1047,7 @@
                     <div class="pong-game-over" id="pongGameOver">
                         GAME OVER<br>
                         <span id="pongFinalScore">0</span> Punkte
+                        <button type="button" class="pong-restart-btn" id="pongRestartBtn">NEUSTART</button>
                     </div>
                     <div class="pong-paddle" id="pongPaddle"></div>
                     <div class="pong-ball" id="pongBall"></div>
@@ -1139,13 +1161,18 @@
         let isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
         if (!isTouchDevice) {
+            let lastTrailTime = 0;
+            const trailInterval = 22; // ms zwischen Trail-Punkten → flüssigere Linie
+
             document.addEventListener('mousemove', (e) => {
-                // Move main dot
+                const now = performance.now();
                 cursorDot.style.left = e.clientX + 'px';
                 cursorDot.style.top = e.clientY + 'px';
 
-                // Create trail particle
-                createTrail(e.clientX, e.clientY);
+                if (now - lastTrailTime >= trailInterval) {
+                    lastTrailTime = now;
+                    createTrail(e.clientX, e.clientY);
+                }
             });
 
             // Interactive hover effects for cursor
@@ -1178,10 +1205,7 @@
 
             document.body.appendChild(trail);
 
-            // Remove element after animation ends (500ms)
-            setTimeout(() => {
-                trail.remove();
-            }, 500);
+            setTimeout(() => trail.remove(), 800);
         }
 
         // --- 3. Retro Countdown ---
@@ -1516,6 +1540,14 @@
             }
 
             pongStart.addEventListener('click', () => startPong());
+
+            const pongRestartBtn = document.getElementById('pongRestartBtn');
+            if (pongRestartBtn) {
+                pongRestartBtn.addEventListener('click', () => {
+                    pongGameOver.classList.remove('show');
+                    startPong();
+                });
+            }
 
             // Maus-Steuerung für Paddle
             pongGame.addEventListener('mousemove', (e) => {
