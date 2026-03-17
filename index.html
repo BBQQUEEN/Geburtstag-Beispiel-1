@@ -421,52 +421,54 @@
 
         .coin-row {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
-            gap: 2.5rem;
+            gap: 1.2rem;
+            flex-wrap: wrap;
         }
 
-        .coin-stack {
-            position: relative;
-            width: 90px;
-            height: 120px;
+        .coin-row .coins-inline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
         }
 
-        .coin-stack .coin {
-            position: absolute;
-            left: 0;
-        }
-
-        /* große, kaskadenartig übereinander liegende gelbe Münzen */
-        .coin-stack .coin[data-coin-index="0"] { bottom: 0; left: 0; }
-        .coin-stack .coin[data-coin-index="1"] { bottom: 18px; left: 8px; }
-        .coin-stack .coin[data-coin-index="2"] { bottom: 36px; left: 16px; }
-        .coin-stack .coin[data-coin-index="3"] { bottom: 54px; left: 24px; }
-        .coin-stack .coin[data-coin-index="4"] { bottom: 72px; left: 32px; }
-
+        /* Pixel-Art Coin: Gold, Oktagon, $ Symbol */
         .coin {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fff, #ffeb3b 45%, #fbc02d 80%);
-            border: 3px solid var(--yellow);
-            box-shadow: 0 0 12px var(--yellow), 0 0 22px rgba(255, 234, 0, 0.9);
+            width: 56px;
+            height: 56px;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+            background: linear-gradient(145deg, #ffd54f 0%, #ffeb3b 25%, #fbc02d 50%, #f9a825 75%, #ff8f00 100%);
+            border: 3px solid #1a1a1a;
+            box-shadow: 
+                inset 2px 2px 4px rgba(255,255,255,0.9),
+                inset -2px -2px 4px rgba(0,0,0,0.3),
+                0 0 8px rgba(255, 234, 0, 0.5);
             position: relative;
             cursor: none !important;
             transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
 
         .coin::after {
-            content: "C";
+            content: "$";
             position: absolute;
             inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem;
-            color: #000;
-            text-shadow: 0 0 4px rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            color: #b8860b;
+            text-shadow: 
+                1px 1px 0 #1a1a1a,
+                -1px -1px 0 #1a1a1a,
+                1px -1px 0 #1a1a1a,
+                -1px 1px 0 #1a1a1a,
+                0 0 2px #1a1a1a;
+            filter: drop-shadow(0 0 1px #1a1a1a);
         }
 
         .coin.used {
@@ -474,9 +476,9 @@
             pointer-events: none;
         }
 
-        .coin.pop {
-            transform: translateY(-50px);
-            box-shadow: 0 0 16px var(--yellow), 0 0 26px rgba(255, 234, 0, 0.9);
+        .coin.sliding {
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+            z-index: 100;
         }
 
         .coin-slot {
@@ -518,6 +520,114 @@
             font-size: 0.55rem;
             letter-spacing: 1px;
             color: #999;
+        }
+
+        /* Pong Minigame */
+        .minigame-section {
+            margin: 4rem auto;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .minigame-title {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--cyan);
+        }
+
+        .pong-game {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 280px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+            border: 2px solid var(--magenta);
+            border-radius: 12px;
+            box-shadow: var(--box-glow-magenta);
+            overflow: hidden;
+        }
+
+        .pong-paddle {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 12px;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--cyan);
+            cursor: none !important;
+            transition: left 0.05s ease-out;
+        }
+
+        .pong-ball {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--lime);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--lime), 0 0 20px var(--lime);
+            pointer-events: none;
+        }
+
+        .pong-score {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--yellow);
+            text-shadow: 0 0 5px var(--yellow);
+        }
+
+        .pong-start {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border: 2px solid var(--lime);
+            color: var(--lime);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            cursor: none !important;
+            border-radius: 8px;
+            box-shadow: var(--box-glow-lime);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .pong-start:hover {
+            background: var(--lime);
+            color: #000;
+            text-shadow: none;
+        }
+
+        .pong-game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 16px 28px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid var(--magenta);
+            color: var(--magenta);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            text-align: center;
+            line-height: 1.8;
+            border-radius: 8px;
+            box-shadow: var(--box-glow-magenta);
+            z-index: 10;
+            display: none;
+        }
+
+        .pong-game-over.show {
+            display: block;
         }
 
         /* Music Player */
@@ -870,16 +980,16 @@
 
                 <div class="coin-area">
                     <div class="coin-row">
-                        <div class="coin-stack" id="coinStack">
-                            <div class="coin" data-coin-index="4"></div>
-                            <div class="coin" data-coin-index="3"></div>
-                            <div class="coin" data-coin-index="2"></div>
+                        <div class="coins-inline" id="coinStack">
+                            <div class="coin" data-coin-index="0"></div>
                             <div class="coin" data-coin-index="1"></div>
-                            <div class="coin" data-coin-index="0" id="topCoin"></div>
+                            <div class="coin" data-coin-index="2"></div>
+                            <div class="coin" data-coin-index="3"></div>
+                            <div class="coin" data-coin-index="4"></div>
                         </div>
                         <div class="coin-slot" id="coinSlot"></div>
                     </div>
-                    <div class="pixel-font coin-text">Klick auf die oberste Neon-Münze, um sie in den Slot zu schießen.</div>
+                    <div class="pixel-font coin-text">Klick auf eine Münze, um sie in den Slot rutschen zu lassen.</div>
                 </div>
             </section>
 
@@ -906,6 +1016,21 @@
                     </p>
                 </div>
             </div>
+
+            <!-- Pong Minigame -->
+            <section class="minigame-section">
+                <h2 class="pixel-font minigame-title neon-text-cyan">RETRO PONG – Ball halten!</h2>
+                <div class="pong-game" id="pongGame">
+                    <div class="pong-score" id="pongScore">0</div>
+                    <button class="pong-start" id="pongStart">START</button>
+                    <div class="pong-game-over" id="pongGameOver">
+                        GAME OVER<br>
+                        <span id="pongFinalScore">0</span> Punkte
+                    </div>
+                    <div class="pong-paddle" id="pongPaddle"></div>
+                    <div class="pong-ball" id="pongBall"></div>
+                </div>
+            </section>
 
             <!-- Music Player Section -->
             <section class="player-section">
@@ -1183,23 +1308,24 @@
 
             coins.forEach((coin) => {
                 coin.addEventListener('click', () => {
-                    // nur jeweils die aktuell oberste (sichtbare) Münze darf verwendet werden
-                    const topVisible = coins.find(c => !c.classList.contains('used'));
-                    if (coin !== topVisible || hypeLevel >= 100) return;
+                    if (coin.classList.contains('used') || hypeLevel >= 100) return;
 
                     const { left, width, top, height } = coin.getBoundingClientRect();
                     const sRect = slotRect();
 
                     // kleine Animation: Münze „springt“ optisch in den Slot
-                    coin.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+                    coin.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease';
                     const offsetX = (sRect.left + sRect.width / 2) - (left + width / 2);
                     const offsetY = (sRect.top + sRect.height / 2) - (top + height / 2);
-                    coin.style.transform = `translate(${offsetX}px, ${offsetY - 20}px)`;
-                    coin.classList.add('pop');
+                    coin.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(0.4)`;
+                    coin.style.opacity = '0.5';
+                    coin.classList.add('sliding');
 
                     setTimeout(() => {
                         coin.classList.add('used');
+                        coin.classList.remove('sliding');
                         coin.style.transform = '';
+                        coin.style.opacity = '';
                         coin.style.transition = '';
 
                         addHype(20);
@@ -1215,7 +1341,7 @@
                             },
                             colors: ['#ffea00', '#00ffff', '#ff00ff']
                         });
-                    }, 240);
+                    }, 500);
                 });
             });
         }
@@ -1298,7 +1424,125 @@
             setEqPlaying(false);
             document.body.classList.remove('music-playing');
         });
+
+        // --- 7. Pong Minigame ---
+        const pongGame = document.getElementById('pongGame');
+        const pongPaddle = document.getElementById('pongPaddle');
+        const pongBall = document.getElementById('pongBall');
+        const pongStart = document.getElementById('pongStart');
+        const pongScore = document.getElementById('pongScore');
+        const pongGameOver = document.getElementById('pongGameOver');
+        const pongFinalScore = document.getElementById('pongFinalScore');
+
+        if (pongGame && pongPaddle && pongBall) {
+            const gameRect = () => pongGame.getBoundingClientRect();
+            const GAME_W = 400;
+            const GAME_H = 280;
+            const PADDLE_W = 80;
+            const PADDLE_H = 12;
+            const BALL_SIZE = 14;
+            const BALL_SPEED = 2;
+            const PADDLE_SPEED = 8;
+
+            let pongRunning = false;
+            let pongScoreVal = 0;
+            let ballX, ballY, ballDX, ballDY;
+            let paddleX;
+            let animId;
+
+            function resetPong() {
+                ballX = GAME_W / 2 - BALL_SIZE / 2;
+                ballY = GAME_H / 2 - BALL_SIZE / 2;
+                ballDX = (Math.random() > 0.5 ? 1 : -1) * BALL_SPEED * 0.7;
+                ballDY = -BALL_SPEED;
+                paddleX = GAME_W / 2 - PADDLE_W / 2;
+                pongScoreVal = 0;
+                pongScore.textContent = '0';
+                pongPaddle.style.left = paddleX + 'px';
+                pongBall.style.left = ballX + 'px';
+                pongBall.style.top = ballY + 'px';
+                pongGameOver.classList.remove('show');
+                pongStart.style.display = 'block';
+            }
+
+            function startPong() {
+                resetPong();
+                pongRunning = true;
+                pongStart.style.display = 'none';
+                gameLoop();
+            }
+
+            function gameOver() {
+                pongRunning = false;
+                cancelAnimationFrame(animId);
+                pongFinalScore.textContent = pongScoreVal;
+                pongGameOver.classList.add('show');
+                pongStart.style.display = 'block';
+                pongStart.textContent = 'NOCHMAL';
+            }
+
+            function gameLoop() {
+                if (!pongRunning) return;
+
+                ballX += ballDX;
+                ballY += ballDY;
+
+                // Wände
+                if (ballX <= 0 || ballX >= GAME_W - BALL_SIZE) ballDX *= -1;
+                if (ballY <= 0) ballDY *= -1;
+
+                // Boden = Game Over
+                if (ballY >= GAME_H - BALL_SIZE) {
+                    gameOver();
+                    return;
+                }
+
+                // Paddle-Kollision
+                const paddleTop = GAME_H - 15 - PADDLE_H;
+                if (ballDY > 0 && ballY + BALL_SIZE >= paddleTop && ballY <= paddleTop + PADDLE_H &&
+                    ballX + BALL_SIZE >= paddleX && ballX <= paddleX + PADDLE_W) {
+                    ballDY *= -1;
+                    const hitPos = (ballX + BALL_SIZE / 2) - (paddleX + PADDLE_W / 2);
+                    ballDX = (hitPos / (PADDLE_W / 2)) * 2;
+                    pongScoreVal++;
+                    pongScore.textContent = pongScoreVal;
+                    addHype(2);
+                }
+
+                pongBall.style.left = ballX + 'px';
+                pongBall.style.top = ballY + 'px';
+
+                animId = requestAnimationFrame(gameLoop);
+            }
+
+            pongStart.addEventListener('click', () => startPong());
+
+            // Maus-Steuerung für Paddle
+            pongGame.addEventListener('mousemove', (e) => {
+                if (!pongRunning) return;
+                const rect = gameRect();
+                let x = e.clientX - rect.left - PADDLE_W / 2;
+                x = Math.max(0, Math.min(GAME_W - PADDLE_W, x));
+                paddleX = x;
+                pongPaddle.style.left = paddleX + 'px';
+            });
+
+            // Tastatur-Steuerung
+            document.addEventListener('keydown', (e) => {
+                if (!pongRunning) return;
+                if (e.key === 'ArrowLeft') {
+                    paddleX = Math.max(0, paddleX - PADDLE_SPEED);
+                    pongPaddle.style.left = paddleX + 'px';
+                } else if (e.key === 'ArrowRight') {
+                    paddleX = Math.min(GAME_W - PADDLE_W, paddleX + PADDLE_SPEED);
+                    pongPaddle.style.left = paddleX + 'px';
+                }
+            });
+
+            resetPong();
+        }
     </script>
 </body>
 </html>
+
 
