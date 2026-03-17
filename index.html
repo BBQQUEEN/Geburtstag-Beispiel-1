@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Florians 22. Geburtstag - 90s Neon Rave</title>
+    
+    <!-- Google Fonts: Retro Pixel & Modern Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* CSS Variables for Normal & Blacklight Mode */
+        :root {
+            --bg-color: #0a0a0a;
+            --grid-color: rgba(255, 255, 255, 0.03);
+            --text-main: #e0e0e0;
+            
+            /* Base Neon Colors */
+            --cyan: #0ff;
+            --magenta: #f0f;
+            --lime: #39ff14;
+            --yellow: #ffea00;
+            
+            /* Glow Intensities - Normal Mode */
+            --glow-spread-sm: 2px;
+            --glow-spread-md: 5px;
+            --glow-spread-lg: 10px;
+            --glow-opacity: 0.6;
+            
+            /* Box Shadows */
+            --box-glow-cyan: 0 0 10px rgba(0, 255, 255, 0.3);
+            --box-glow-magenta: 0 0 10px rgba(255, 0, 255, 0.3);
+            --box-glow-lime: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        /* BLACKLIGHT MODE OVERRIDES */
+        body.blacklight-active {
+            --bg-color: #020005; /* Deep UV Purple/Black */
+            --grid-color: rgba(138, 43, 226, 0.22);
+            --text-main: #fff;
+            
+            /* Supercharged Glow Intensities */
+            --glow-spread-sm: 5px;
+            --glow-spread-md: 15px;
+            --glow-spread-lg: 30px;
+            --glow-opacity: 1;
+            
+            /* Intense Box Shadows */
+            --box-glow-cyan: 0 0 25px rgba(0, 255, 255, 0.9), inset 0 0 20px rgba(0, 255, 255, 0.6);
+            --box-glow-magenta: 0 0 25px rgba(255, 0, 255, 0.9), inset 0 0 20px rgba(255, 0, 255, 0.6);
+            --box-glow-lime: 0 0 25px rgba(57, 255, 20, 0.9), inset 0 0 20px rgba(57, 255, 20, 0.6);
+        }
+
+        /* Extra blacklight FX on the whole content */
+        body.blacklight-active #main-wrapper {
+            filter: saturate(1.6) contrast(1.35);
+        }
+
+        body.blacklight-active::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0,255,255,0.15), transparent 55%),
+                radial-gradient(circle at 80% 10%, rgba(255,0,255,0.18), transparent 55%),
+                radial-gradient(circle at 50% 90%, rgba(57,255,20,0.18), transparent 55%);
+            mix-blend-mode: screen;
+            z-index: 2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Hide default cursor everywhere */
+            cursor: none !important; 
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, background-image 0.3s ease;
+            
+            /* Retro Grid Background */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
+        }
+
+        /* Typography */
+        h1, h2, h3, .pixel-font {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+
+        .neon-text-cyan {
+            color: #fff;
+            text-shadow: 
+                0 0 var(--glow-spread-sm) #fff,
+                0 0 var(--glow-spread-md) #fff,
+                0 0 var(--glow-spread-lg) var(--cyan),
+                0 0 calc(var(--glow-spread-lg) * 2) var(--cyan);
+            transition: text-shadow 0.3s ease;
+        }
+
+        .neon-text-magenta {
+            color: #fff;
+            text-shadow: 
+                0 0 var(--glow-spread-sm) #fff,
+                0 0 var(--glow-spread-md) #fff,
+                0 0 var(--glow-spread-lg) var(--magenta),
+                0 0 calc(var(--glow-spread-lg) * 2) var(--magenta),
+                0 0 calc(var(--glow-spread-lg) * 3) var(--magenta);
+            transition: text-shadow 0.3s ease;
+        }
+
+        .neon-text-lime {
+            color: #fff;
+            text-shadow: 
+                0 0 var(--glow-spread-sm) #fff,
+                0 0 var(--glow-spread-md) var(--lime),
+                0 0 var(--glow-spread-lg) var(--lime);
+            transition: text-shadow 0.3s ease;
+        }
+
+        /* Flicker Animation for the Switch Effect */
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; filter: brightness(1); }
+            20%, 22%, 24%, 55% { opacity: 0.35; filter: brightness(0.25); }
+        }
+        .is-flickering {
+            animation: flicker 0.8s ease-in-out forwards;
+        }
+
+        /* Layout Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header / Hero */
+        header {
+            text-align: center;
+            padding: 4rem 0 2rem;
+            position: relative;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            margin-bottom: 1rem;
+            display: block;
+            color: var(--cyan);
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 3.5rem);
+            margin-bottom: 1.5rem;
+            word-wrap: break-word;
+        }
+
+        /* Blacklight Toggle */
+        .toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .toggle-label {
+            font-size: 0.7rem;
+            color: var(--magenta);
+            text-shadow: 0 0 5px var(--magenta);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: none !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 34px;
+            border: 2px solid #555;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #fff;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        input:checked + .slider {
+            background-color: #2a004d;
+            border-color: var(--magenta);
+            box-shadow: 0 0 15px var(--magenta);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+            background-color: var(--magenta);
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--magenta);
+        }
+
+        /* Countdown */
+        .countdown-wrapper {
+            background: rgba(10, 10, 10, 0.8);
+            border: 2px solid var(--lime);
+            box-shadow: var(--box-glow-lime);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem auto;
+            max-width: 800px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        body.blacklight-active .countdown-wrapper {
+            transform: scale(1.03);
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 3vw, 3rem);
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-val {
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: var(--lime);
+        }
+
+        .time-label {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* Info Sections */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .info-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+        }
+
+        .card-cyan::before { background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+        .card-cyan { box-shadow: var(--box-glow-cyan); }
+        
+        .card-magenta::before { background: var(--magenta); box-shadow: 0 0 15px var(--magenta); }
+        .card-magenta { box-shadow: var(--box-glow-magenta); }
+
+        .info-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        .icon {
+            font-size: 2rem;
+        }
+
+        .map-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 1px dashed var(--cyan);
+            padding-bottom: 2px;
+            transition: all 0   .2s;
+        }
+        .map-link:hover {
+            color: #fff;
+            text-shadow: 0 0 10px var(--cyan);
+            border-color: #fff;
+        }
+
+        /* Hype-Level / Gamification */
+        .hype-section {
+            margin: 3rem auto 4rem;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .hype-label {
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+        }
+
+        .hype-bar-outer {
+            position: relative;
+            height: 24px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--magenta);
+            box-shadow: var(--box-glow-magenta);
+            overflow: hidden;
+        }
+
+        .hype-bar-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta), var(--lime), var(--yellow));
+            background-size: 200% 100%;
+            box-shadow: 0 0 15px var(--magenta);
+            transition: width 0.4s ease-out;
+        }
+
+        body.blacklight-active .hype-bar-inner {
+            animation: hypeScan 1.4s linear infinite;
+        }
+
+        @keyframes hypeScan {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        .hype-value {
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: #aaa;
+        }
+
+        /* Insert Coin Area */
+        .coin-area {
+            margin-top: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .coin-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 2.5rem;
+        }
+
+        .coin-stack {
+            position: relative;
+            width: 90px;
+            height: 120px;
+        }
+
+        .coin-stack .coin {
+            position: absolute;
+            left: 0;
+        }
+
+        /* große, kaskadenartig übereinander liegende gelbe Münzen */
+        .coin-stack .coin[data-coin-index="0"] { bottom: 0; left: 0; }
+        .coin-stack .coin[data-coin-index="1"] { bottom: 18px; left: 8px; }
+        .coin-stack .coin[data-coin-index="2"] { bottom: 36px; left: 16px; }
+        .coin-stack .coin[data-coin-index="3"] { bottom: 54px; left: 24px; }
+        .coin-stack .coin[data-coin-index="4"] { bottom: 72px; left: 32px; }
+
+        .coin {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #ffeb3b 45%, #fbc02d 80%);
+            border: 3px solid var(--yellow);
+            box-shadow: 0 0 12px var(--yellow), 0 0 22px rgba(255, 234, 0, 0.9);
+            position: relative;
+            cursor: none !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+
+        .coin::after {
+            content: "C";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            color: #000;
+            text-shadow: 0 0 4px rgba(255,255,255,0.9);
+        }
+
+        .coin.used {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .coin.pop {
+            transform: translateY(-50px);
+            box-shadow: 0 0 16px var(--yellow), 0 0 26px rgba(255, 234, 0, 0.9);
+        }
+
+        .coin-slot {
+            width: 96px;
+            height: 26px;
+            border-radius: 999px;
+            background: linear-gradient(145deg, #050505, #151515);
+            border: 2px solid var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coin-slot::before {
+            content: "";
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            top: 50%;
+            height: 4px;
+            transform: translateY(-50%);
+            border-radius: 999px;
+            background: linear-gradient(90deg, #000, #111, #000);
+            box-shadow: inset 0 0 6px #000;
+        }
+
+        .coin-slot::after {
+            content: "INSERT";
+            position: absolute;
+            top: 2px;
+            right: 10%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.4rem;
+            color: var(--cyan);
+            opacity: 0.7;
+        }
+
+        .coin-text {
+            font-size: 0.55rem;
+            letter-spacing: 1px;
+            color: #999;
+        }
+
+        /* Music Player */
+        .player-section {
+            margin: 4rem auto;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .player-title {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .player-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--cyan);
+            box-shadow: var(--box-glow-cyan);
+        }
+
+        .player-button {
+            border: 2px solid var(--lime);
+            border-radius: 999px;
+            padding: 0.8rem 1.8rem;
+            background: #050505;
+            color: var(--lime);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: none !important;
+            box-shadow: var(--box-glow-lime);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s;
+        }
+
+        .player-button:hover {
+            transform: scale(1.05);
+            background-color: var(--lime);
+            color: #000;
+            box-shadow: 0 0 25px var(--lime);
+        }
+
+        .eq-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 22px;
+        }
+
+        .eq-bar {
+            width: 4px;
+            border-radius: 999px;
+            background: var(--magenta);
+            opacity: 0.4;
+        }
+
+        .eq-bar.playing {
+            opacity: 1;
+            animation: eqBounce 0.5s infinite ease-in-out alternate;
+        }
+
+        .eq-bar:nth-child(2).playing { animation-duration: 0.42s; }
+        .eq-bar:nth-child(3).playing { animation-duration: 0.35s; }
+        .eq-bar:nth-child(4).playing { animation-duration: 0.47s; }
+        .eq-bar:nth-child(5).playing { animation-duration: 0.38s; }
+
+        @keyframes eqBounce {
+            0% { height: 20%; }
+            100% { height: 100%; }
+        }
+
+        /* Menu Section */
+        .menu-section {
+            margin-top: 5rem;
+        }
+
+        .menu-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .menu-item {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            transform: scale(1.02);
+            border-color: var(--yellow);
+            box-shadow: 0 0 20px rgba(255, 234, 0, 0.2);
+        }
+
+        .menu-method {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            color: var(--yellow);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .menu-dish {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .menu-desc {
+            font-size: 1rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        /* Footer & RSVP */
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            padding-bottom: 5rem;
+        }
+
+        .rsvp-btn {
+            display: inline-block;
+            background: transparent;
+            color: var(--lime);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            padding: 1.5rem 3rem;
+            border: 3px solid var(--lime);
+            border-radius: 50px;
+            text-decoration: none;
+            text-transform: uppercase;
+            box-shadow: var(--box-glow-lime), inset var(--box-glow-lime);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 10px var(--lime), inset 0 0 10px var(--lime); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px var(--lime), inset 0 0 20px var(--lime); }
+            100% { transform: scale(1); box-shadow: 0 0 10px var(--lime), inset 0 0 10px var(--lime); }
+        }
+
+        .rsvp-btn:hover {
+            background: var(--lime);
+            color: #000;
+            box-shadow: 0 0 50px var(--lime);
+            animation: none;
+            transform: scale(1.1);
+        }
+
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 50%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px #fff, 0 0 20px var(--cyan), 0 0 40px var(--cyan);
+            transition: width 0.2s, height 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
+        .cursor-trail {
+            width: 8px;
+            height: 8px;
+            background: var(--magenta);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--magenta);
+            animation: trailFade 0.5s linear forwards;
+        }
+
+        @keyframes trailFade {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
+        }
+
+        /* PACMAN-22 Animation */
+        .pac22 {
+            position: fixed;
+            top: 20%;
+            left: -10vw;
+            width: 120px;
+            height: 80px;
+            border-radius: 40px;
+            background: radial-gradient(circle at 30% 30%, #fff, #ffeb3b 45%, #fbc02d 80%);
+            box-shadow: 0 0 25px var(--yellow), 0 0 45px rgba(255, 234, 0, 0.9);
+            z-index: 50;
+            transform-origin: center;
+            overflow: hidden;
+            display: none;
+        }
+
+        /* Mund-Ausschnitt über Clip-Path simuliert das Auf/Zu-Gehen */
+        .pac22::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: #020005;
+            clip-path: polygon(10% 0%, 55% 50%, 10% 100%);
+            transform-origin: 50% 50%;
+        }
+
+        /* 22 in der Mitte – Pacman sieht aus wie die 22 */
+        .pac22::after {
+            content: "22";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.4rem;
+            color: #000;
+            text-shadow: 0 0 10px #fff, 0 0 20px #ffeb3b;
+        }
+
+        body.music-playing .pac22 {
+            display: block;
+            animation: pac-run 8s linear infinite, pac-mouth 0.35s ease-in-out infinite;
+        }
+
+        @keyframes pac-run {
+            0%   { transform: translate(-10vw, 20vh); }
+            20%  { transform: translate(110vw, 25vh); }
+            40%  { transform: translate(50vw, -10vh); }
+            60%  { transform: translate(-10vw, 55vh); }
+            80%  { transform: translate(110vw, 75vh); }
+            100% { transform: translate(-10vw, 20vh); }
+        }
+
+        @keyframes pac-mouth {
+            0%, 100% { clip-path: polygon(10% 0%, 55% 50%, 10% 100%); }
+            50% { clip-path: polygon(22% 10%, 55% 50%, 22% 90%); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .countdown { gap: 1rem; }
+            .time-val { font-size: 2rem; }
+            .menu-title { font-size: 1.5rem; }
+            .rsvp-btn { font-size: 0.9rem; padding: 1rem 2rem; }
+            .toggle-container { top: 10px; right: 10px; padding: 5px 10px; }
+            .player-controls { gap: 1rem; padding: 0.8rem 1.2rem; }
+            .player-button { padding: 0.6rem 1.2rem; font-size: 0.55rem; }
+        }
+
+        /* Hide custom cursor on mobile to prevent touch issues */
+        @media (hover: none) and (pointer: coarse) {
+            .cursor-dot, .cursor-trail { display: none !important; }
+            * { cursor: auto !important; }
+            .slider, .player-button { cursor: pointer !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <!-- Pacman 22 -->
+    <div class="pac22" id="pac22"></div>
+
+    <!-- Blacklight Switch -->
+    <div class="toggle-container">
+        <span class="pixel-font toggle-label">BLACKLIGHT</span>
+        <label class="switch">
+            <input type="checkbox" id="blacklight-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Hidden audio element for flo.mp3 (must be in selben Ordner liegen) -->
+    <audio id="floPlayer" src="flo.mp3" preload="auto"></audio>
+
+    <!-- Main Content Wrapper -->
+    <div id="main-wrapper">
+        <div class="container">
+            
+            <header>
+                <span class="pixel-font subtitle neon-text-cyan">Level 22 Unlocked</span>
+                <h1 class="neon-text-magenta">Florians 22.<br>Geburtstag</h1>
+                <p class="pixel-font neon-text-lime" style="font-size: 0.8rem; margin-top: 10px;">90s Neon Rave & BBQ</p>
+            </header>
+
+            <section class="countdown-wrapper">
+                <div class="countdown pixel-font">
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime" id="days">00</span>
+                        <span class="time-label">Tage</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime">:</span>
+                        <span class="time-label">&nbsp;</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime" id="hours">00</span>
+                        <span class="time-label">Stunden</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime">:</span>
+                        <span class="time-label">&nbsp;</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime" id="minutes">00</span>
+                        <span class="time-label">Minuten</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime">:</span>
+                        <span class="time-label">&nbsp;</span>
+                    </div>
+                    <div class="time-box">
+                        <span class="time-val neon-text-lime" id="seconds">00</span>
+                        <span class="time-label">Sekunden</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gamification: Party-Hype-Level -->
+            <section class="hype-section">
+                <div class="pixel-font hype-label neon-text-magenta">PARTY-HYPE-LEVEL</div>
+                <div class="hype-bar-outer">
+                    <div class="hype-bar-inner" id="hypeBar"></div>
+                </div>
+                <div class="pixel-font hype-value" id="hypeText">0% – Insert Coin</div>
+
+                <div class="coin-area">
+                    <div class="coin-row">
+                        <div class="coin-stack" id="coinStack">
+                            <div class="coin" data-coin-index="4"></div>
+                            <div class="coin" data-coin-index="3"></div>
+                            <div class="coin" data-coin-index="2"></div>
+                            <div class="coin" data-coin-index="1"></div>
+                            <div class="coin" data-coin-index="0" id="topCoin"></div>
+                        </div>
+                        <div class="coin-slot" id="coinSlot"></div>
+                    </div>
+                    <div class="pixel-font coin-text">Klick auf die oberste Neon-Münze, um sie in den Slot zu schießen.</div>
+                </div>
+            </section>
+
+            <!-- Location & Dresscode -->
+            <div class="info-grid">
+                <!-- Location Card -->
+                <div class="info-card card-cyan">
+                    <h2 class="neon-text-cyan"><span class="icon">💾</span> Die Location</h2>
+                    <p>
+                        <strong>Wann:</strong> Samstag, 16.05.2026 ab 18:00 Uhr<br><br>
+                        <strong>Wo:</strong> Am Großwallstädter Mainufer. Der Bass weist euch den Weg!
+                    </p>
+                    <a href="https://maps.google.com/?q=Großwallstädter+Mainufer" target="_blank" class="map-link">
+                        📍 Auf Google Maps ansehen
+                    </a>
+                </div>
+
+                <!-- Dresscode Card -->
+                <div class="info-card card-magenta">
+                    <h2 class="neon-text-magenta"><span class="icon">🕹️</span> Dresscode</h2>
+                    <p>
+                        Strictly 90s & Glow in the Dark! <br><br>
+                        Schrille Trainingsanzüge, Neon-Farben, Plateau-Schuhe, Buffalos, Tamagotchis, Knicklichter... was der Kleiderschrank und der Dachboden hergeben.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Music Player Section -->
+            <section class="player-section">
+                <h2 class="pixel-font player-title neon-text-cyan">Flo’s 90s Intro-Track</h2>
+                <div class="player-controls">
+                    <button class="player-button pixel-font" id="playerToggle">
+                        ▶ PLAY FLO.MP3
+                    </button>
+                    <div class="eq-bars" aria-hidden="true">
+                        <div class="eq-bar" id="eq1"></div>
+                        <div class="eq-bar" id="eq2"></div>
+                        <div class="eq-bar" id="eq3"></div>
+                        <div class="eq-bar" id="eq4"></div>
+                        <div class="eq-bar" id="eq5"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Menu Section -->
+            <section class="menu-section">
+                <h2 class="pixel-font menu-title" style="color: var(--yellow); text-shadow: 0 0 15px var(--yellow);">Das Catering Line-Up</h2>
+                
+                <div class="menu-grid">
+                    
+                    <div class="menu-item">
+                        <div class="menu-method">🔥 Keramikgrill</div>
+                        <div class="menu-dish">Neon-Glazed<br>Pulled Pork</div>
+                        <div class="menu-desc">Saftig gesmoktes Pork mit einer absolut knalligen, essbaren Neon-BBQ-Glasur.</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-method">🛢️ Feuertonne</div>
+                        <div class="menu-dish">Flammlachs<br>90s Style</div>
+                        <div class="menu-desc">Am offenen Feuer gegarter Lachs, verfeinert mit einer fruchtigen Mango-Chili-Salsa.</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-method">🥘 Dutch Oven (Groß)</div>
+                        <div class="menu-dish">Mac &<br>Neon-Cheese</div>
+                        <div class="menu-desc">Der absolute 90er-Klassiker! Extrem gelbe, dekadente Käsesoße getoppt mit knusprigem Bacon.</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-method">🥘 Dutch Oven (Mittel)</div>
+                        <div class="menu-dish">Lava-Schokokuchen</div>
+                        <div class="menu-desc">Frisch aus der heißen Glut, serviert mit einem im Schwarzlicht leuchtenden Waldbeer-Kompott.</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-method">🥘 Dutch Oven (Klein)</div>
+                        <div class="menu-dish">Drachenglut Dip</div>
+                        <div class="menu-desc">Ein höllisch guter, feuriger Dip für Nachos und frisches Brot. Nichts für schwache Nerven!</div>
+                    </div>
+
+                    <div class="menu-item">
+                        <div class="menu-method">🍲 Gulaschkanone</div>
+                        <div class="menu-dish">Mitternachts-<br>Zaubertrank</div>
+                        <div class="menu-desc">Ein deftiges Kesselgulasch, das dich nach dem Raven garantiert wieder auf die Beine bringt.</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <footer>
+                <a href="mailto:deine.email@beispiel.de?subject=Zusage%2090er%20Party&body=Hey%20Florian,%20ich%20bin%20dabei!%20Freu%20mich%20mega!" class="rsvp-btn" id="rsvpBtn">
+                    Ich bin dabei! / RSVP
+                </a>
+            </footer>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Confetti Explosion on Load ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            // Neon colors for confetti
+            const colors = ['#00ffff', '#ff00ff', '#39ff14', '#ffea00'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        });
+
+        // --- 2. Custom Glowing Cursor & Trail ---
+        const cursorDot = document.getElementById('cursor-dot');
+        let isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', (e) => {
+                // Move main dot
+                cursorDot.style.left = e.clientX + 'px';
+                cursorDot.style.top = e.clientY + 'px';
+
+                // Create trail particle
+                createTrail(e.clientX, e.clientY);
+            });
+
+            // Interactive hover effects for cursor
+            const interactables = document.querySelectorAll('a, input, label, button');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorDot.style.transform = 'translate(-50%, -50%) scale(2.1)';
+                    cursorDot.style.backgroundColor = 'var(--lime)';
+                    cursorDot.style.boxShadow = '0 0 20px var(--lime), 0 0 40px var(--lime)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
+                    cursorDot.style.backgroundColor = '#fff';
+                    cursorDot.style.boxShadow = '0 0 10px #fff, 0 0 20px var(--cyan), 0 0 40px var(--cyan)';
+                });
+            });
+        }
+
+        function createTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = x + 'px';
+            trail.style.top = y + 'px';
+            
+            // Alternate colors randomly between Magenta, Cyan and Lime
+            const colors = ['var(--magenta)', 'var(--cyan)', 'var(--lime)'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            trail.style.background = randomColor;
+            trail.style.boxShadow = `0 0 10px ${randomColor}`;
+
+            document.body.appendChild(trail);
+
+            // Remove element after animation ends (500ms)
+            setTimeout(() => {
+                trail.remove();
+            }, 500);
+        }
+
+        // --- 3. Retro Countdown ---
+        // Target Date: 16.05.2026, 18:00:00 (Month is 0-indexed in JS Date: 4 = May)
+        const targetDate = new Date(2026, 4, 16, 18, 0, 0).getTime();
+
+        const elDays = document.getElementById('days');
+        const elHours = document.getElementById('hours');
+        const elMinutes = document.getElementById('minutes');
+        const elSeconds = document.getElementById('seconds');
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                // Party time!
+                elDays.innerText = "00";
+                elHours.innerText = "00";
+                elMinutes.innerText = "00";
+                elSeconds.innerText = "00";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Format with leading zero
+            elDays.innerText = String(days).padStart(2, '0');
+            elHours.innerText = String(hours).padStart(2, '0');
+            elMinutes.innerText = String(minutes).padStart(2, '0');
+            elSeconds.innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Initial call
+
+        // --- 4. Blacklight Toggle Switch ---
+        const toggleInput = document.getElementById('blacklight-toggle');
+        const wrapper = document.getElementById('main-wrapper');
+
+        toggleInput.addEventListener('change', (e) => {
+            // Add flicker class
+            wrapper.classList.add('is-flickering');
+            
+            // Wait for flicker to finish half-way before switching theme
+            setTimeout(() => {
+                if(e.target.checked) {
+                    document.body.classList.add('blacklight-active');
+                    addHype(25);
+                } else {
+                    document.body.classList.remove('blacklight-active');
+                }
+            }, 400); // switch theme right in the middle of flicker
+
+            // Remove flicker class after animation completes
+            setTimeout(() => {
+                wrapper.classList.remove('is-flickering');
+            }, 800);
+        });
+
+        // --- 5. Gamification: Hype-Level + Konami Code ---
+        let hypeLevel = 0; // 0–100
+        const hypeBar = document.getElementById('hypeBar');
+        const hypeText = document.getElementById('hypeText');
+        const coinStack = document.getElementById('coinStack');
+        const coins = coinStack ? Array.from(coinStack.querySelectorAll('.coin')) : [];
+        const coinSlot = document.getElementById('coinSlot');
+
+        function setHype(percent, label) {
+            const clamped = Math.max(0, Math.min(100, percent));
+            hypeLevel = clamped;
+            hypeBar.style.width = clamped + '%';
+            hypeText.textContent = clamped + '% – ' + label;
+        }
+
+        function addHype(amount) {
+            const newVal = Math.min(100, hypeLevel + amount);
+            let label = 'Insert Coin';
+            if (newVal >= 100) {
+                label = 'MAX LEVEL – READY TO RAVE';
+                // Große Confetti-Fontänen von links und rechts
+                const end = Date.now() + 1200;
+                const colors = ['#00ffff', '#ff00ff', '#39ff14', '#ffea00'];
+
+                (function sideBursts() {
+                    confetti({
+                        particleCount: 12,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0, y: 0.8 },
+                        colors
+                    });
+                    confetti({
+                        particleCount: 12,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1, y: 0.8 },
+                        colors
+                    });
+                    if (Date.now() < end) {
+                        requestAnimationFrame(sideBursts);
+                    }
+                })();
+            } else if (newVal >= 75) {
+                label = 'ULTRA COMBO';
+            } else if (newVal >= 50) {
+                label = 'PARTY MODE ACTIVATED';
+            } else if (newVal >= 25) {
+                label = 'WARM-UP';
+            }
+            setHype(newVal, label);
+        }
+
+        // Increase hype when RSVP is clicked
+        const rsvpBtn = document.getElementById('rsvpBtn');
+        rsvpBtn.addEventListener('click', () => addHype(30));
+
+        // --- Insert Coin „Click to Slot“ ---
+        if (coins.length && coinSlot) {
+            const slotRect = () => coinSlot.getBoundingClientRect();
+
+            coins.forEach((coin) => {
+                coin.addEventListener('click', () => {
+                    // nur jeweils die aktuell oberste (sichtbare) Münze darf verwendet werden
+                    const topVisible = coins.find(c => !c.classList.contains('used'));
+                    if (coin !== topVisible || hypeLevel >= 100) return;
+
+                    const { left, width, top, height } = coin.getBoundingClientRect();
+                    const sRect = slotRect();
+
+                    // kleine Animation: Münze „springt“ optisch in den Slot
+                    coin.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+                    const offsetX = (sRect.left + sRect.width / 2) - (left + width / 2);
+                    const offsetY = (sRect.top + sRect.height / 2) - (top + height / 2);
+                    coin.style.transform = `translate(${offsetX}px, ${offsetY - 20}px)`;
+                    coin.classList.add('pop');
+
+                    setTimeout(() => {
+                        coin.classList.add('used');
+                        coin.style.transform = '';
+                        coin.style.transition = '';
+
+                        addHype(20);
+                        const centerX = sRect.left + sRect.width / 2;
+                        const centerY = sRect.top + sRect.height / 2;
+
+                        confetti({
+                            particleCount: 45,
+                            spread: 45,
+                            origin: {
+                                x: centerX / window.innerWidth,
+                                y: centerY / window.innerHeight
+                            },
+                            colors: ['#ffea00', '#00ffff', '#ff00ff']
+                        });
+                    }, 240);
+                });
+            });
+        }
+
+        // Konami Code: ↑ ↑ ↓ ↓ ← → ← → B A
+        const konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+        let konamiIndex = 0;
+
+        window.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if (key === konamiSequence[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiSequence.length) {
+                    konamiIndex = 0;
+                    // Reward: Blacklight an, Hype hoch, Konfetti
+                    document.body.classList.add('blacklight-active');
+                    toggleInput.checked = true;
+                    addHype(50);
+                    confetti({
+                        particleCount: 200,
+                        spread: 120,
+                        origin: { y: 0.4 }
+                    });
+                    alert('Konami-Code aktiviert! Bonus-Konfetti freigeschaltet 🎉');
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        // --- 6. MP3 Player flo.mp3 ---
+        const audioEl = document.getElementById('floPlayer');
+        const playerToggle = document.getElementById('playerToggle');
+        const pac22 = document.getElementById('pac22');
+        const eqBars = [
+            document.getElementById('eq1'),
+            document.getElementById('eq2'),
+            document.getElementById('eq3'),
+            document.getElementById('eq4'),
+            document.getElementById('eq5')
+        ];
+
+        let isPlaying = false;
+
+        function setEqPlaying(playing) {
+            eqBars.forEach(bar => {
+                if (playing) {
+                    bar.classList.add('playing');
+                } else {
+                    bar.classList.remove('playing');
+                }
+            });
+        }
+
+        playerToggle.addEventListener('click', async () => {
+            try {
+                if (!isPlaying) {
+                    await audioEl.play();
+                    isPlaying = true;
+                    playerToggle.textContent = '⏸ PAUSE FLO.MP3';
+                    addHype(15);
+                    setEqPlaying(true);
+                    document.body.classList.add('music-playing');
+                } else {
+                    audioEl.pause();
+                    isPlaying = false;
+                    playerToggle.textContent = '▶ PLAY FLO.MP3';
+                    setEqPlaying(false);
+                    document.body.classList.remove('music-playing');
+                }
+            } catch (err) {
+                console.error('Audio konnte nicht gestartet werden:', err);
+                alert('Dein Browser blockiert evtl. Autoplay. Bitte einmal irgendwo klicken und dann nochmal versuchen.');
+            }
+        });
+
+        audioEl.addEventListener('ended', () => {
+            isPlaying = false;
+            playerToggle.textContent = '▶ PLAY FLO.MP3';
+            setEqPlaying(false);
+            document.body.classList.remove('music-playing');
+        });
+    </script>
+</body>
+</html>
+
