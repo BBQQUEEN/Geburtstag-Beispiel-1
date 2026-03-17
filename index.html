@@ -650,6 +650,19 @@
             color: #000;
         }
 
+        .pong-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+            gap: 10px;
+        }
+
+        .pong-restart-outside {
+            margin: 0;
+            padding: 10px 22px;
+            font-size: 0.6rem;
+        }
+
         /* Music Player */
         .player-section {
             margin: 4rem auto;
@@ -925,7 +938,7 @@
         @media (hover: none) and (pointer: coarse) {
             .cursor-dot, .cursor-trail { display: none !important; }
             * { cursor: auto !important; }
-            .slider, .player-button, .pong-start, .pong-restart-btn { cursor: pointer !important; }
+            .slider, .player-button, .pong-start, .pong-restart-btn, .pong-restart-outside { cursor: pointer !important; }
         }
     </style>
 </head>
@@ -971,22 +984,6 @@
                     <div class="time-box">
                         <span class="time-val neon-text-lime" id="hours">00</span>
                         <span class="time-label">Stunden</span>
-                    </div>
-                    <div class="time-box">
-                        <span class="time-val neon-text-lime">:</span>
-                        <span class="time-label">&nbsp;</span>
-                    </div>
-                    <div class="time-box">
-                        <span class="time-val neon-text-lime" id="minutes">00</span>
-                        <span class="time-label">Minuten</span>
-                    </div>
-                    <div class="time-box">
-                        <span class="time-val neon-text-lime">:</span>
-                        <span class="time-label">&nbsp;</span>
-                    </div>
-                    <div class="time-box">
-                        <span class="time-val neon-text-lime" id="seconds">00</span>
-                        <span class="time-label">Sekunden</span>
                     </div>
                 </div>
             </section>
@@ -1051,6 +1048,9 @@
                     </div>
                     <div class="pong-paddle" id="pongPaddle"></div>
                     <div class="pong-ball" id="pongBall"></div>
+                </div>
+                <div class="pong-buttons">
+                    <button type="button" class="pong-restart-btn pong-restart-outside" id="pongRestartOutside">RESTART</button>
                 </div>
             </section>
 
@@ -1214,35 +1214,25 @@
 
         const elDays = document.getElementById('days');
         const elHours = document.getElementById('hours');
-        const elMinutes = document.getElementById('minutes');
-        const elSeconds = document.getElementById('seconds');
 
         function updateCountdown() {
             const now = new Date().getTime();
             const distance = targetDate - now;
 
             if (distance < 0) {
-                // Party time!
                 elDays.innerText = "00";
                 elHours.innerText = "00";
-                elMinutes.innerText = "00";
-                elSeconds.innerText = "00";
                 return;
             }
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Format with leading zero
             elDays.innerText = String(days).padStart(2, '0');
             elHours.innerText = String(hours).padStart(2, '0');
-            elMinutes.innerText = String(minutes).padStart(2, '0');
-            elSeconds.innerText = String(seconds).padStart(2, '0');
         }
 
-        setInterval(updateCountdown, 1000);
+        setInterval(updateCountdown, 60000);
         updateCountdown(); // Initial call
 
         // --- 4. Blacklight Toggle Switch ---
@@ -1541,13 +1531,17 @@
 
             pongStart.addEventListener('click', () => startPong());
 
-            const pongRestartBtn = document.getElementById('pongRestartBtn');
-            if (pongRestartBtn) {
-                pongRestartBtn.addEventListener('click', () => {
-                    pongGameOver.classList.remove('show');
-                    startPong();
-                });
+            function restartPong() {
+                pongGameOver.classList.remove('show');
+                pongStart.style.display = 'none';
+                startPong();
             }
+
+            const pongRestartBtn = document.getElementById('pongRestartBtn');
+            if (pongRestartBtn) pongRestartBtn.addEventListener('click', restartPong);
+
+            const pongRestartOutside = document.getElementById('pongRestartOutside');
+            if (pongRestartOutside) pongRestartOutside.addEventListener('click', restartPong);
 
             // Maus-Steuerung für Paddle
             pongGame.addEventListener('mousemove', (e) => {
